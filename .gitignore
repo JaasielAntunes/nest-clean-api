@@ -44,6 +44,12 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+arquivo-base64.txt
+arquivo-pub-base64.txt
+private_key.pem
+public_key.pem
+private.key
+public.key
 
 # temp directory
 .temp
