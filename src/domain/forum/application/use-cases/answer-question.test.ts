@@ -7,7 +7,7 @@ let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let sut: AnswerQuestionUseCase;
 
-describe('Create Answer', () => {
+describe('Criar resposta', () => {
   beforeEach(() => {
     inMemoryAnswerAttachmentsRepository =
       new InMemoryAnswerAttachmentsRepository();
@@ -17,10 +17,10 @@ describe('Create Answer', () => {
     sut = new AnswerQuestionUseCase(inMemoryAnswersRepository);
   });
 
-  it('should be able to create a answer', async () => {
+  test('deve ser possível criar uma resposta', async () => {
     const result = await sut.execute({
       questionId: '1',
-      instructorId: '1',
+      authorId: '1',
       content: 'Conteúdo da resposta',
       attachmentsIds: ['1', '2'],
     });
