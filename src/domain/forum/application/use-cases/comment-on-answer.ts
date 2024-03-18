@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
-import { AnswersRepository } from "../repositories/answers-repository";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { AnswerComment } from "@/domain/forum/enterprise/entities/answer-comment";
-import { AnswerCommentsRepository } from "@/domain/forum/application/repositories/answer-comments-repository";
-import { Either, left, right } from "@/core/either";
-import { ResourceNotFoundError } from "@/core/errors/errors/resource-not-found-error";
+import { AnswersRepository } from '../repositories/answers-repository';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { AnswerComment } from '@/domain/forum/enterprise/entities/answer-comment';
+import { AnswerCommentsRepository } from '@/domain/forum/application/repositories/answer-comments-repository';
+import { Either, left, right } from '@/core/either';
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error';
+import { Injectable } from '@nestjs/common';
 
 interface CommentOnAnswerUseCaseRequest {
   authorId: string;
@@ -19,6 +19,7 @@ type CommentOnAnswerUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class CommentOnAnswerUseCase {
   constructor(
     private answersRepository: AnswersRepository,
