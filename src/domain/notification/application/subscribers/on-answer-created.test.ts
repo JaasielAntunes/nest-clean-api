@@ -1,7 +1,4 @@
-/* eslint-disable no-new */
-import { OnAnswerCreated } from '@/domain/notification/application/subscribers/on-answer-created';
 import { makeAnswer } from 'test/factories/make-answer';
-import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questions-repository';
@@ -14,12 +11,15 @@ import { InMemoryNotificationsRepository } from 'test/repositories/in-memory-not
 import { makeQuestion } from 'test/factories/make-question';
 import { SpyInstance } from 'vitest';
 import { waitFor } from 'test/utils/wait-for';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
 
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
-let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let inMemoryNotificationsRepository: InMemoryNotificationsRepository;
+let inMemoryStudentsRepository: InMemoryStudentsRepository;
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository;
 let sendNotificationUseCase: SendNotificationUseCase;
 
 let sendNotificationExecuteSpy: SpyInstance<
@@ -31,13 +31,12 @@ describe('Resposta já criada', () => {
   beforeEach(() => {
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
+    inMemoryStudentsRepository = new InMemoryStudentsRepository();
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository();
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
-    );
-    inMemoryAnswerAttachmentsRepository =
-      new InMemoryAnswerAttachmentsRepository();
-    inMemoryAnswersRepository = new InMemoryAnswersRepository(
-      inMemoryAnswerAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+      inMemoryStudentsRepository,
     );
     inMemoryNotificationsRepository = new InMemoryNotificationsRepository();
     sendNotificationUseCase = new SendNotificationUseCase(
@@ -45,8 +44,6 @@ describe('Resposta já criada', () => {
     );
 
     sendNotificationExecuteSpy = vi.spyOn(sendNotificationUseCase, 'execute');
-
-    new OnAnswerCreated(inMemoryQuestionsRepository, sendNotificationUseCase);
   });
 
   test('deve enviar uma notificação quando uma resposta for criada', async () => {

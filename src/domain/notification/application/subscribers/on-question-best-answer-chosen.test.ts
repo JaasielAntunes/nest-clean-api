@@ -1,4 +1,3 @@
-/* eslint-disable no-new */
 import { makeAnswer } from 'test/factories/make-answer';
 import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
@@ -14,12 +13,16 @@ import { makeQuestion } from 'test/factories/make-question';
 import { SpyInstance } from 'vitest';
 import { waitFor } from 'test/utils/wait-for';
 import { OnQuestionBestAnswerChosen } from '@/domain/notification/application/subscribers/on-question-best-answer-chosen';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
 
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let inMemoryNotificationsRepository: InMemoryNotificationsRepository;
+let inMemoryStudentsRepository: InMemoryStudentsRepository;
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository;
 let sendNotificationUseCase: SendNotificationUseCase;
 
 let sendNotificationExecuteSpy: SpyInstance<
@@ -31,8 +34,12 @@ describe('Na pergunta, melhor resposta escolhida', () => {
   beforeEach(() => {
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
+    inMemoryStudentsRepository = new InMemoryStudentsRepository();
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository();
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+      inMemoryStudentsRepository,
     );
     inMemoryAnswerAttachmentsRepository =
       new InMemoryAnswerAttachmentsRepository();
@@ -52,7 +59,7 @@ describe('Na pergunta, melhor resposta escolhida', () => {
     );
   });
 
-  test('deve enviar uma notificação quando o tópico tiver uma nova melhor resposta escolhida', async () => {
+  test('deve enviar uma notificação quando uma resposta for criada', async () => {
     const question = makeQuestion();
     const answer = makeAnswer({ questionId: question.id });
 
