@@ -1,95 +1,61 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import { InMemoryQuestionCommentsRepository } from 'test/repositories/in-memory-question-comments-repository';
-import { FetchQuestionCommentsUseCase } from '@/domain/forum/application/use-cases/fetch-question-comments';
-import { makeQuestionComment } from 'test/factories/make-question-comment';
+import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questions-repository';
+import { makeQuestion } from 'test/factories/make-question';
+import { FetchRecentQuestionsUseCase } from './fetch-recent-questions';
+import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
 import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
-import { makeStudent } from 'test/factories/make-student';
 
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
+let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository;
 let inMemoryStudentsRepository: InMemoryStudentsRepository;
-let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
-let sut: FetchQuestionCommentsUseCase;
+let sut: FetchRecentQuestionsUseCase;
 
-describe('Buscar comentários da pergunta', () => {
+describe('Buscar perguntas recentes', () => {
   beforeEach(() => {
-    inMemoryQuestionCommentsRepository = inMemoryStudentsRepository =
-      new InMemoryStudentsRepository();
-    inMemoryQuestionCommentsRepository = new InMemoryQuestionCommentsRepository(
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository();
+    inMemoryStudentsRepository = new InMemoryStudentsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+      inMemoryAttachmentsRepository,
       inMemoryStudentsRepository,
     );
-    sut = new FetchQuestionCommentsUseCase(inMemoryQuestionCommentsRepository);
+    sut = new FetchRecentQuestionsUseCase(inMemoryQuestionsRepository);
   });
 
-  test('deve ser possível buscar os comentários da pergunta', async () => {
-    const student = makeStudent({ name: 'John Doe' });
-    inMemoryStudentsRepository.items.push(student);
-
-    await inMemoryQuestionCommentsRepository.create(
-      makeQuestionComment({
-        questionId: new UniqueEntityID('question-1'),
-      }),
+  test('deve ser capaz de buscar perguntas recentes', async () => {
+    await inMemoryQuestionsRepository.create(
+      makeQuestion({ createdAt: new Date(2022, 0, 20) }),
+    );
+    await inMemoryQuestionsRepository.create(
+      makeQuestion({ createdAt: new Date(2022, 0, 18) }),
+    );
+    await inMemoryQuestionsRepository.create(
+      makeQuestion({ createdAt: new Date(2022, 0, 23) }),
     );
 
-    const comment1 = makeQuestionComment({
-      questionId: new UniqueEntityID('question-1'),
-      authorId: student.id,
-    });
-
-    const comment2 = makeQuestionComment({
-      questionId: new UniqueEntityID('question-1'),
-      authorId: student.id,
-    });
-
-    const comment3 = makeQuestionComment({
-      questionId: new UniqueEntityID('question-1'),
-      authorId: student.id,
-    });
-
-    await inMemoryQuestionCommentsRepository.create(comment1);
-    await inMemoryQuestionCommentsRepository.create(comment2);
-    await inMemoryQuestionCommentsRepository.create(comment3);
-
     const result = await sut.execute({
-      questionId: 'question-1',
       page: 1,
     });
 
-    expect(result.value?.comments).toHaveLength(3);
-    expect(result.value?.comments).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          author: 'John Doe',
-          commentId: comment1.id,
-        }),
-        expect.objectContaining({
-          author: 'John Doe',
-          commentId: comment2.id,
-        }),
-        expect.objectContaining({
-          author: 'John Doe',
-          commentId: comment3.id,
-        }),
-      ]),
-    );
+    expect(result.value?.questions).toEqual([
+      expect.objectContaining({ createdAt: new Date(2022, 0, 23) }),
+      expect.objectContaining({ createdAt: new Date(2022, 0, 20) }),
+      expect.objectContaining({ createdAt: new Date(2022, 0, 18) }),
+    ]);
   });
 
-  test('deve ser possível paginar', async () => {
-    const student = makeStudent({ name: 'John Doe' });
-    inMemoryStudentsRepository.items.push(student);
-
+  test('deve ser capaz de buscar perguntas recentes paginadas', async () => {
     for (let i = 1; i <= 22; i++) {
-      await inMemoryQuestionCommentsRepository.create(
-        makeQuestionComment({
-          questionId: new UniqueEntityID('question-1'),
-          authorId: student.id,
-        }),
-      );
+      await inMemoryQuestionsRepository.create(makeQuestion());
     }
 
     const result = await sut.execute({
-      questionId: 'question-1',
       page: 2,
     });
 
-    expect(result.value?.comments).toHaveLength(2);
+    expect(result.value?.questions).toHaveLength(2);
   });
 });

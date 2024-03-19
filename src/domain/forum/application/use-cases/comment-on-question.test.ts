@@ -1,42 +1,46 @@
-import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questions-repository';
-import { makeQuestion } from 'test/factories/make-question';
-import { InMemoryQuestionCommentsRepository } from 'test/repositories/in-memory-question-comments-repository';
-import { CommentOnQuestionUseCase } from '@/domain/forum/application/use-cases/comment-on-question';
-import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
+import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
+import { makeAnswer } from 'test/factories/make-answer';
+import { InMemoryAnswerCommentsRepository } from 'test/repositories/in-memory-answer-comments-repository';
+import { CommentOnAnswerUseCase } from '@/domain/forum/application/use-cases/comment-on-answer';
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
 
-let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
-let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
-let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
-let sut: CommentOnQuestionUseCase;
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
+let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
+let inMemoryStudentsRepository: InMemoryStudentsRepository;
+let sut: CommentOnAnswerUseCase;
 
 describe('Comentar na pergunta', () => {
   beforeEach(() => {
-    inMemoryQuestionAttachmentsRepository =
-      new InMemoryQuestionAttachmentsRepository();
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
-      inMemoryQuestionAttachmentsRepository,
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    inMemoryStudentsRepository = new InMemoryStudentsRepository();
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
     );
-    inMemoryQuestionCommentsRepository =
-      new InMemoryQuestionCommentsRepository();
+    inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository(
+      inMemoryStudentsRepository,
+    );
 
-    sut = new CommentOnQuestionUseCase(
-      inMemoryQuestionsRepository,
-      inMemoryQuestionCommentsRepository,
+    sut = new CommentOnAnswerUseCase(
+      inMemoryAnswersRepository,
+      inMemoryAnswerCommentsRepository,
     );
   });
 
   test('deve ser possível comentar na pergunta', async () => {
-    const question = makeQuestion();
+    const answer = makeAnswer();
 
-    await inMemoryQuestionsRepository.create(question);
+    await inMemoryAnswersRepository.create(answer);
 
     await sut.execute({
-      questionId: question.id.toString(),
-      authorId: question.authorId.toString(),
+      answerId: answer.id.toString(),
+      authorId: answer.authorId.toString(),
       content: 'Comentário teste',
     });
 
-    expect(inMemoryQuestionCommentsRepository.items[0].content).toEqual(
+    expect(inMemoryAnswerCommentsRepository.items[0].content).toEqual(
       'Comentário teste',
     );
   });
