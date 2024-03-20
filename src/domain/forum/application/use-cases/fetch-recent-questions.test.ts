@@ -2,22 +2,30 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { makeQuestion } from 'test/factories/make-question';
 import { FetchRecentQuestionsUseCase } from './fetch-recent-questions';
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
 
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository;
+let inMemoryStudentsRepository: InMemoryStudentsRepository;
 let sut: FetchRecentQuestionsUseCase;
 
-describe('Buscar perguntas recentes', () => {
+describe('Perguntas recentes', () => {
   beforeEach(() => {
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository();
+    inMemoryStudentsRepository = new InMemoryStudentsRepository();
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+      inMemoryStudentsRepository,
     );
     sut = new FetchRecentQuestionsUseCase(inMemoryQuestionsRepository);
   });
 
-  test('Deves ser possível buscar perguntas recentes', async () => {
+  test('deve ser capaz de buscar perguntas recentes', async () => {
     await inMemoryQuestionsRepository.create(
       makeQuestion({ createdAt: new Date(2022, 0, 20) }),
     );
@@ -39,7 +47,7 @@ describe('Buscar perguntas recentes', () => {
     ]);
   });
 
-  test('Deve ser possível paginar', async () => {
+  test('deve ser capaz de buscar perguntas recentes paginadas', async () => {
     for (let i = 1; i <= 22; i++) {
       await inMemoryQuestionsRepository.create(makeQuestion());
     }
