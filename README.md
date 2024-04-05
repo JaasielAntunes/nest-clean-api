@@ -1,5 +1,5 @@
 <h1 align="center">
-  Esta é uma aplicação back-end desenvolvida durante o módulo DDD no Node.js e NestJS da formação Node.js da Rocketseat.
+  Esta é uma aplicação back-end desenvolvida durante o módulo DDD no Node.js e NestJS da formação Node.js da <a href="https://app.rocketseat.com.br/home">Rocketseat</a>.
 </h1>
 
 <p align="center">
