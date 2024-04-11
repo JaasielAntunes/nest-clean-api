@@ -25,7 +25,7 @@ como principal objetivo simplificar a forma de alunos sanarem dúvidas com instr
 
 ---
 
-## 💻 Tecnologias utilizadas
+## 💻 Tecnologias
 
 - NestJS
 - NestJS JWT
