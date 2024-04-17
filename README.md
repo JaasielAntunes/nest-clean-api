@@ -34,6 +34,7 @@ como principal objetivo simplificar a forma de alunos sanarem dúvidas com instr
 - PostgreSQL
 - Zod
 - Docker
+- JavaScript
 - Typescript
 - IOredis
 - Rxjs
